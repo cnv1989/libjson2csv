@@ -9,24 +9,29 @@ from utils import repr_simple_list
 from utils import to_string
 
 
-MINIMIZE_COLUMNS = True
+MINIMIZE_COLUMNS = False
 
 
 def reduce_key(key, value):
 
     reduced_item = {}
 
-    # When item is a list create multiple columns with
+    # Reduction Condition 1
+    # When item is a list
     if type(value) is list:
         if MINIMIZE_COLUMNS and is_simple_list(value):
+            # If the value is a simple list i.e. the list is a list of strings or integers, group all the values
+            # under single column
             reduced_item[repr_simple_list(key)] = to_string(value)
         else:
             i = 0
             for sub_item in value:
+                # Create a new column for each of the index in the list.
                 reduced_item.update(reduce_key("%s%s" % (key, repr_index(i)), sub_item))
                 i = i + 1
 
     # Reduction Condition 2
+    # If value is a dict reduces each of the values and nest the sub_key under the parent key.
     elif type(value) is dict:
         for sub_key, sub_value in value.items():
             sub_reduced_items = reduce_key(sub_key, sub_value)
@@ -70,7 +75,7 @@ def convert_to_csv(raw_data):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print "\nUsage: python json_to_csv.py <node_name> <json_in_file_path> <csv_out_file_path>\n"
+        print "\nUsage: python json_to_csv.py <json_in_file_path> <csv_out_file_path>\n"
     else:
         # Reading arguments
         json_file_path = sys.argv[2]

@@ -1,7 +1,16 @@
-FORMATTERS = {
-    "index": "[%s]",
-    "key": ".%s",
-    "simple_list": "*%s",
+FORMATS = {
+    "index": {
+        "specifier": "[%s]",
+        "regex": ""
+    },
+    "key": {
+        "specifier": ".%s",
+        "regex": ""
+    },
+    "simple_list": {
+        "specifier": "*%s",
+        "regex": ""
+    }
 }
 
 
@@ -17,11 +26,11 @@ def to_string(s):
 
 
 def repr_index(x):
-    return FORMATTERS["index"] % to_string(x)
+    return FORMATS["index"]["specifier"] % to_string(x)
 
 
 def repr_key(x):
-    return FORMATTERS["key"] % to_string(x)
+    return FORMATS["key"]["specifier"] % to_string(x)
 
 
 def is_simple_list(elements):
@@ -32,4 +41,4 @@ def is_simple_list(elements):
 
 
 def repr_simple_list(x):
-    return FORMATTERS["simple_list"] % to_string(x)
+    return FORMATS["simple_list"]["specifier"] % to_string(x)
