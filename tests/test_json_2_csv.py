@@ -1,6 +1,6 @@
 import unittest
 
-from json_to_csv.json_2_csv import reduce_item
+from libjson2csv.json_2_csv import reduce_item
 
 
 class TestJson2Csv(unittest.TestCase):

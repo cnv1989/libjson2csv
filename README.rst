@@ -1,4 +1,4 @@
-json_to_csv
+libjson2csv
 ========
 
 *Converts nested json object to csv and csv back to json*
