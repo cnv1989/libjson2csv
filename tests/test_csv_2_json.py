@@ -1,8 +1,8 @@
 import unittest
 
-from ..csv_2_json import add_or_update_key_in_dict
-from ..csv_2_json import create_schema_dict_from_fieldnames
-from ..csv_2_json import get_object_in_dict
+from csv_2_json import add_or_update_key_in_dict
+from csv_2_json import create_schema_dict_from_fieldnames
+from csv_2_json import get_object_in_dict
 
 
 class TestCsv2Json(unittest.TestCase):
@@ -68,6 +68,19 @@ class TestCsv2Json(unittest.TestCase):
         self.assertEqual(add_or_update_key_in_dict({}, ['key_1_2[1]'], value='val_1_2_1'), {
             'key_1_2': [None, 'val_1_2_1']
         })
+
+        self.assertEqual(add_or_update_key_in_dict({'key_1_1': {}}, ['key_1_1', 'key_1_1_2'], value='val_1_1_2_1'), {
+            'key_1_1': {
+                'key_1_1_2': 'val_1_1_2_1'
+            }
+        })
+
+        self.assertEqual(add_or_update_key_in_dict({}, ['key_1_1', 'key_1_1_2'], level=0), {
+            'key_1_1': {}
+        })
+
+        with self.assertRaises(ValueError):
+            add_or_update_key_in_dict({'key_1_1': {}}, ['key_1_1', 'key_1_1_2'], level=0, value='val_1_1_2_1')
 
         with self.assertRaises(KeyError):
             add_or_update_key_in_dict({}, ['key_1_1', 'key_1_1_2'], value='val_1_1_2_1')

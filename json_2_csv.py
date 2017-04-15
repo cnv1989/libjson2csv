@@ -1,58 +1,56 @@
+import argparse
 import csv
 import json
-import sys
 
-from .utils import is_simple_list
-from .utils import repr_compound_list
-from .utils import repr_key
-from .utils import repr_simple_list
-from .utils import to_string
-
-
-MINIMIZE_COLUMNS = True
+from utils import is_simple_list
+from utils import repr_compound_list
+from utils import repr_key
+from utils import repr_simple_list
+from utils import to_string
 
 
-def reduce_key(key, value):
+def reduce_key(key, value, minimize_columns=False):
+    """Flattens the value of the key and appends the keys in the value dictionary to parent key.
+    """
 
     reduced_item = {}
 
-    # Reduction Condition 1
-    # When item is a list
     if type(value) is list:
-        if MINIMIZE_COLUMNS and is_simple_list(value):
-            # If the value is a simple list i.e. the list is a list of strings or integers, group all the values
-            # under single column
+        '''Reduction Condition 1: value of the key is a list'''
+
+        if minimize_columns and is_simple_list(value):
+            '''If the value is a simple list i.e. the list is a list of strings or integers, group all the values
+            under single column'''
             reduced_item[repr_simple_list(key)] = to_string(value)
         else:
             i = 0
             for sub_item in value:
-                # Create a new column for each of the index in the list.
+                '''Create a new column for each of the index in the list.'''
                 reduced_item.update(reduce_key("%s" % (repr_compound_list(key, i)), sub_item))
                 i = i + 1
 
-    # Reduction Condition 2
-    # If value is a dict reduces each of the values and nest the sub_key under the parent key.
     elif type(value) is dict:
+        '''Reduction Condition 1: value of the key is a dictionary'''
         for sub_key, sub_value in value.items():
             sub_reduced_items = reduce_key(sub_key, sub_value)
             for _key, _value in sub_reduced_items.items():
                 reduced_item["%s.%s" % (key, repr_key(_key))] = _value
 
-    # Base Condition
     else:
         reduced_item[to_string(key)] = to_string(value)
 
     return reduced_item
 
 
-def reduce_item(item):
+def reduce_item(item, minimize_columns=False):
+    """Returns a flat dictionary with keys representing the headers in csv"""
     processed_data = {}
     for key, value in item.items():
-        processed_data.update(reduce_key(key, value))
+        processed_data.update(reduce_key(key, value, minimize_columns=minimize_columns))
     return processed_data
 
 
-def convert_to_csv(raw_data):
+def convert_to_csv(raw_data, minimize_columns=False):
 
     data_to_be_processed = raw_data
 
@@ -63,7 +61,7 @@ def convert_to_csv(raw_data):
     headers = []
 
     for item in data_to_be_processed:
-        row = reduce_item(item)
+        row = reduce_item(item, minimize_columns=minimize_columns)
         rows.append(row)
         headers += row.keys()
 
@@ -74,22 +72,25 @@ def convert_to_csv(raw_data):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("\nUsage: python json_to_csv.py <json_in_file_path> <csv_out_file_path>\n")
-    else:
-        # Reading arguments
-        json_file_path = sys.argv[2]
-        csv_file_path = sys.argv[3]
+    parser = argparse.ArgumentParser(prog='json_2_csv.py',
+                                     usage='%(prog)s [--minimize-columns] <json_in_file_path> <csv_out_file_path>',
+                                     description='Converts json to csv.')
 
-        fp = open(json_file_path, 'r')
-        json_value = fp.read()
-        raw_data = json.loads(json_value)
-        headers, processed_data = convert_to_csv(raw_data)
+    parser.add_argument('--minimize-columns', action='store_true')
+    parser.add_argument('json_in_file_path', type=str)
+    parser.add_argument('csv_out_file_path', type=str)
 
-        with open(csv_file_path, 'wb+') as f:
-            writer = csv.DictWriter(f, headers, quoting=csv.QUOTE_ALL)
-            writer.writeheader()
-            for row in processed_data:
-                writer.writerow(row)
+    args = parser.parse_args()
 
-        print("Just completed writing csv file with %d columns" % len(headers))
+    fp = open(args.json_in_file_path, 'r')
+    json_value = fp.read()
+    raw_data = json.loads(json_value)
+    headers, processed_data = convert_to_csv(raw_data, minimize_columns=args.minimize_columns)
+
+    with open(args.csv_out_file_path, 'w') as f:
+        writer = csv.DictWriter(f, headers)
+        writer.writeheader()
+        for row in processed_data:
+            writer.writerow(row)
+
+    print("Just completed writing csv file with %d columns" % len(headers))
