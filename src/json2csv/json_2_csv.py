@@ -2,11 +2,11 @@ import argparse
 import csv
 import json
 
-from utils import is_simple_list
-from utils import repr_compound_list
-from utils import repr_key
-from utils import repr_simple_list
-from utils import to_string
+from .utils import is_simple_list
+from .utils import repr_compound_list
+from .utils import repr_key
+from .utils import repr_simple_list
+from .utils import to_string
 
 
 def reduce_key(key, value, minimize_columns=False):

@@ -2,8 +2,8 @@ import argparse
 import csv
 
 from copy import deepcopy
-from utils import extract_key_and_index
-from utils import pretty_dump
+from .utils import extract_key_and_index
+from .utils import pretty_dump
 
 
 def get_object_in_dict(dictionary, keys_list):

@@ -1,0 +1,10 @@
+setup.cfg
+setup.py
+src/json2csv/__init__.py
+src/json2csv/csv_2_json.py
+src/json2csv/json_2_csv.py
+src/json2csv/utils.py
+src/json2csv.egg-info/PKG-INFO
+src/json2csv.egg-info/SOURCES.txt
+src/json2csv.egg-info/dependency_links.txt
+src/json2csv.egg-info/top_level.txt

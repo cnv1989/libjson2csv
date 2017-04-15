@@ -1,8 +1,8 @@
 import unittest
 
-from csv_2_json import add_or_update_key_in_dict
-from csv_2_json import create_schema_dict_from_fieldnames
-from csv_2_json import get_object_in_dict
+from json2csv.csv_2_json import add_or_update_key_in_dict
+from json2csv.csv_2_json import create_schema_dict_from_fieldnames
+from json2csv.csv_2_json import get_object_in_dict
 
 
 class TestCsv2Json(unittest.TestCase):
