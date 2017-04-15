@@ -2,14 +2,14 @@ import csv
 import json
 import sys
 
-from utils import is_simple_list
-from utils import repr_index
-from utils import repr_key
-from utils import repr_simple_list
-from utils import to_string
+from .utils import is_simple_list
+from .utils import repr_compound_list
+from .utils import repr_key
+from .utils import repr_simple_list
+from .utils import to_string
 
 
-MINIMIZE_COLUMNS = False
+MINIMIZE_COLUMNS = True
 
 
 def reduce_key(key, value):
@@ -27,7 +27,7 @@ def reduce_key(key, value):
             i = 0
             for sub_item in value:
                 # Create a new column for each of the index in the list.
-                reduced_item.update(reduce_key("%s%s" % (key, repr_index(i)), sub_item))
+                reduced_item.update(reduce_key("%s" % (repr_compound_list(key, i)), sub_item))
                 i = i + 1
 
     # Reduction Condition 2
@@ -36,7 +36,7 @@ def reduce_key(key, value):
         for sub_key, sub_value in value.items():
             sub_reduced_items = reduce_key(sub_key, sub_value)
             for _key, _value in sub_reduced_items.items():
-                reduced_item["%s%s" % (key, repr_key(_key))] = _value
+                reduced_item["%s.%s" % (key, repr_key(_key))] = _value
 
     # Base Condition
     else:
@@ -75,7 +75,7 @@ def convert_to_csv(raw_data):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print "\nUsage: python json_to_csv.py <json_in_file_path> <csv_out_file_path>\n"
+        print("\nUsage: python json_to_csv.py <json_in_file_path> <csv_out_file_path>\n")
     else:
         # Reading arguments
         json_file_path = sys.argv[2]
@@ -92,4 +92,4 @@ if __name__ == "__main__":
             for row in processed_data:
                 writer.writerow(row)
 
-        print "Just completed writing csv file with %d columns" % len(headers)
+        print("Just completed writing csv file with %d columns" % len(headers))
