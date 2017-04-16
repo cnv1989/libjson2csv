@@ -131,8 +131,11 @@ def create_schema_dict_from_fieldnames(fieldnames):
     return schema_dict
 
 
-def get_json_for_row(row, fieldnames, schema_dict):
-    dictionary = deepcopy(schema_dict)
+def get_json_for_row(row, fieldnames, schema_dict=None):
+    if schema_dict:
+        dictionary = deepcopy(schema_dict)
+    else:
+        dictionary = create_schema_dict_from_fieldnames(fieldnames)
     for field in fieldnames:
         value = row.get(field)
         dictionary = add_or_update_key_in_dict(dictionary, field.split('.'), value=value)
