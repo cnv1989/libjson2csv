@@ -2,6 +2,12 @@ import argparse
 import csv
 import json
 
+# Compatible with both python 2 and python 3
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 from .utils import is_simple_list
 from .utils import repr_compound_list
 from .utils import repr_key
@@ -50,7 +56,7 @@ def reduce_item(item, minimize_columns=False):
     return processed_data
 
 
-def convert_to_csv(raw_data, minimize_columns=False):
+def reduce_json(raw_data, minimize_columns=False):
 
     data_to_be_processed = raw_data
 
@@ -71,26 +77,36 @@ def convert_to_csv(raw_data, minimize_columns=False):
     return headers, rows
 
 
+def convert_to_csv(raw_data, output=None, minimize_columns=False):
+    if not output:
+        output = StringIO()
+    headers, processed_data = reduce_json(raw_data, minimize_columns=minimize_columns)
+    writer = csv.DictWriter(output, headers)
+    writer.writeheader()
+    for row in processed_data:
+        writer.writerow(row)
+    return output
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='json_2_csv.py',
-                                     usage='%(prog)s [--minimize-columns] <json_in_file_path> <csv_out_file_path>',
+                                     usage='%(prog)s [--m] <json_in_file> [<csv_out_file>]',
                                      description='Converts json to csv.')
 
-    parser.add_argument('--minimize-columns', action='store_true')
-    parser.add_argument('json_in_file_path', type=str)
-    parser.add_argument('csv_out_file_path', type=str)
+    parser.add_argument('--m', action='store_true')
+    parser.add_argument('json_in_file', type=argparse.FileType('r'))
+    parser.add_argument('csv_out_file', nargs='?', type=argparse.FileType('w'))
 
     args = parser.parse_args()
 
-    fp = open(args.json_in_file_path, 'r')
-    json_value = fp.read()
+    json_value = args.json_in_file.read()
     raw_data = json.loads(json_value)
-    headers, processed_data = convert_to_csv(raw_data, minimize_columns=args.minimize_columns)
 
-    with open(args.csv_out_file_path, 'w') as f:
-        writer = csv.DictWriter(f, headers)
-        writer.writeheader()
-        for row in processed_data:
-            writer.writerow(row)
+    output = convert_to_csv(raw_data, output=args.csv_out_file, minimize_columns=args.m)
 
-    print("Just completed writing csv file with %d columns" % len(headers))
+    if not args.csv_out_file:
+        print(output.getvalue())
+
+    output.close()
+
+    print("Just completed converting to csv.")

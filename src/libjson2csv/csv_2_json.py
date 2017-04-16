@@ -2,6 +2,7 @@ import argparse
 import csv
 
 from copy import deepcopy
+
 from .utils import extract_key_and_index
 from .utils import pretty_dump
 
@@ -160,19 +161,23 @@ def convert_to_json(csv_reader):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='csv_2_json.py',
-                                     usage='%(prog)s <csv_in_file_path> <json_out_file_path>',
+                                     usage='%(prog)s <csv_in_file_path> [<json_out_file_path>]',
                                      description='Converts csv to json')
 
-    parser.add_argument('csv_in_file_path', type=str)
-    parser.add_argument('json_out_file_path', type=str)
+    parser.add_argument('csv_in_file', type=argparse.FileType('r'))
+    parser.add_argument('json_out_file', nargs='?', type=argparse.FileType('w'))
 
     args = parser.parse_args()
 
-    with open(args.csv_in_file_path, 'r') as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        json_data = convert_to_json(csv_reader)
+    csv_reader = csv.DictReader(args.csv_in_file)
+    json_data = convert_to_json(csv_reader)
 
-        with open(args.json_out_file_path, 'w') as json_file:
-            json_file.write(pretty_dump(json_data))
+    if args.json_out_file:
+        args.json_out_file.write(pretty_dump(json_data))
+        args.json_out_file.close()
+    else:
+        print(pretty_dump(json_data))
 
-    print("Just completed writing the json file")
+    args.csv_in_file.close()
+
+    print("Just completed converting to json.")
