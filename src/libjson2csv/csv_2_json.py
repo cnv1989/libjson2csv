@@ -72,7 +72,7 @@ def add_or_update_key_in_dict(dictionary, keys_list, level=-1, value=None):
             '''if key is not a terminal key then it must be a dictionary'''
             current_location[key_name] = {}
     elif key_type == 'simple_list':
-        if level == 0:
+        if level == 0 or level == -1:
             if is_terminal_key:
                 current_location[key_name] = value.split(';') if value else []
             else:
