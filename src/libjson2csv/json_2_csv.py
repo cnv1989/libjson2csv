@@ -27,7 +27,7 @@ def reduce_key(key, value, minimize_columns=False):
         if minimize_columns and is_simple_list(value):
             '''If the value is a simple list i.e. the list is a list of strings or integers, group all the values
             under single column'''
-            reduced_item[repr_simple_list(key)] = to_string(value)
+            reduced_item[repr_key(key)] = (to_string(value), True)
         else:
             i = 0
             for sub_item in value:
@@ -38,21 +38,27 @@ def reduce_key(key, value, minimize_columns=False):
     elif type(value) is dict:
         '''Reduction Condition 1: value of the key is a dictionary'''
         for sub_key, sub_value in value.items():
-            sub_reduced_items = reduce_key(sub_key, sub_value)
+            sub_reduced_items = reduce_key(sub_key, sub_value, minimize_columns=minimize_columns)
             for _key, _value in sub_reduced_items.items():
                 reduced_item["%s.%s" % (key, repr_key(_key))] = _value
 
     else:
-        reduced_item[to_string(key)] = to_string(value)
+        reduced_item[to_string(key)] = (to_string(value), False)
 
     return reduced_item
 
 
 def reduce_item(item, minimize_columns=False):
     """Returns a flat dictionary with keys representing the headers in csv"""
-    processed_data = {}
+    _data = {}
     for key, value in item.items():
-        processed_data.update(reduce_key(key, value, minimize_columns=minimize_columns))
+        _data.update(reduce_key(key, value, minimize_columns=minimize_columns))
+
+    processed_data = {}
+    for key, value in _data.items():
+        if value[1]:
+            key = repr_simple_list(key)
+        processed_data[key] = value[0]
     return processed_data
 
 

@@ -27,6 +27,11 @@ class TestJson2Csv(unittest.TestCase):
                 'key_1_5_2_1': [{
                     'key_1_5_2_3_1': 'val_1_5_2_3_1_1'
                 }]
+            },
+            'key_1_6': {
+                'key_1_6_2_1': {
+                    'key_1_6_2_1_3_1': ['a', 'b', 'c']
+                }
             }
         }
 
@@ -40,7 +45,10 @@ class TestJson2Csv(unittest.TestCase):
             'key_1_3[1].key_1_3_2_1': 'val_1_3_2_1_2',
             'key_1_3[2].key_1_3_2_1': 'val_1_3_2_1_3',
             'key_1_4.key_1_4_2_1': 'val_1_4_2_1_1',
-            'key_1_5.key_1_5_2_1[0].key_1_5_2_3_1': 'val_1_5_2_3_1_1'
+            'key_1_5.key_1_5_2_1[0].key_1_5_2_3_1': 'val_1_5_2_3_1_1',
+            'key_1_6.key_1_6_2_1.key_1_6_2_1_3_1[0]': 'a',
+            'key_1_6.key_1_6_2_1.key_1_6_2_1_3_1[1]': 'b',
+            'key_1_6.key_1_6_2_1.key_1_6_2_1_3_1[2]': 'c',
         }
 
         csv_row = reduce_item(sample_dict)
@@ -54,7 +62,8 @@ class TestJson2Csv(unittest.TestCase):
             'key_1_3[1].key_1_3_2_1': 'val_1_3_2_1_2',
             'key_1_3[2].key_1_3_2_1': 'val_1_3_2_1_3',
             'key_1_4.key_1_4_2_1': 'val_1_4_2_1_1',
-            'key_1_5.key_1_5_2_1[0].key_1_5_2_3_1': 'val_1_5_2_3_1_1'
+            'key_1_5.key_1_5_2_1[0].key_1_5_2_3_1': 'val_1_5_2_3_1_1',
+            '*key_1_6.key_1_6_2_1.key_1_6_2_1_3_1': 'a;b;c'
         }
 
         csv_row = reduce_item(sample_dict, minimize_columns=True)
@@ -98,3 +107,6 @@ class TestJson2Csv(unittest.TestCase):
 
         csv_row = reduce_item(sample_dict, minimize_columns=True)
         self.assertCountEqual(csv_row.keys(), expected_csv_row.keys())
+
+if __name__ == '__main__':
+    unittest.main()

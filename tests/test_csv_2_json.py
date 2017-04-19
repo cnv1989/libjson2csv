@@ -25,6 +25,11 @@ class TestCsv2Json(unittest.TestCase):
             }],
             'key_1_4': {
                 'key_1_4_2_1': 'val_1_4_2_1_1'
+            },
+            'key_1_6': {
+                'key_1_6_2_1': {
+                    'key_1_6_2_1_3_1': ['a', 'b', 'c']
+                }
             }
         }
 
@@ -45,6 +50,8 @@ class TestCsv2Json(unittest.TestCase):
 
         obj = get_object_in_dict(sample_dict, ['key_1_4', 'key_1_4_2_1'])
         self.assertEqual(obj, sample_dict['key_1_4']['key_1_4_2_1'])
+
+        obj = get_object_in_dict(sample_dict, ['*key_1_6', 'key_1_6_2_1', 'key_1_6_2_1_3_1'])
 
         with self.assertRaises(KeyError):
             get_object_in_dict(sample_dict, ['key_1_5'])
@@ -97,10 +104,12 @@ class TestCsv2Json(unittest.TestCase):
             'key_1_1',
             'key_1_2.key_1_2_2_1',
             'key_1_2.key_1_2_2_2',
-            'key_1_3.*key_1_3_2_1',
+            '*key_1_3.key_1_3_2_1',
             'key_1_4[1].key_1_4_2_1',
-            'key_1_5.key_1_5_2_1.key_1_5_2_3_1'
+            'key_1_5.key_1_5_2_1.key_1_5_2_3_1',
+            '*key_1_6.key_1_6_2_1.key_1_6_2_1_3_1'
         ]
+
         dictionary = create_schema_dict_from_fieldnames(fieldnames)
         expected_dict = {
             'key_1_1': None,
@@ -120,6 +129,11 @@ class TestCsv2Json(unittest.TestCase):
             'key_1_5': {
                 'key_1_5_2_1': {
                     'key_1_5_2_3_1': None
+                }
+            },
+            'key_1_6': {
+                'key_1_6_2_1': {
+                    'key_1_6_2_1_3_1': []
                 }
             }
         }

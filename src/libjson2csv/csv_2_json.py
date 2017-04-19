@@ -58,6 +58,7 @@ def add_or_update_key_in_dict(dictionary, keys_list, level=-1, value=None):
     '''get the reference to the dictionary that holds the key within the nesting'''
     current_location = get_object_in_dict(dictionary, keys_list[:level])
     key_index_info = extract_key_and_index(keys_list[level])
+    parent_key_info = extract_key_and_index(keys_list[0])
 
     key_type = key_index_info[0]
     key_name = key_index_info[1]
@@ -65,16 +66,19 @@ def add_or_update_key_in_dict(dictionary, keys_list, level=-1, value=None):
     if key_type == 'key':
         if is_terminal_key:
             current_location[key_name] = value
+            if parent_key_info[0] == 'simple_list':
+                current_location[key_name] = value.split(';') if value else []
         else:
             '''if key is not a terminal key then it must be a dictionary'''
             current_location[key_name] = {}
-
     elif key_type == 'simple_list':
-        if not is_terminal_key:
-            raise KeyError('simple list key type must be a terminal key')
-        current_location[key_name] = []
-        if value:
-            current_location[key_name] = value.split(';')
+        if level == 0:
+            if is_terminal_key:
+                current_location[key_name] = value.split(';') if value else []
+            else:
+                current_location[key_name] = {}
+        else:
+            raise KeyError('* should be on the top most key.')
 
     elif key_type == 'compound_list':
         key_index = int(key_index_info[2])
