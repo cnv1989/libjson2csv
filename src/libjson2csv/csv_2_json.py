@@ -22,7 +22,7 @@ def get_object_in_dict(dictionary, keys_list):
         key_name = key_index_info[1]
         if key_type == 'key' or key_type == 'simple_list':
             value = value[key_name]
-        elif key_type == 'compound_list':
+        elif key_type == 'compound_list' or key_type == 'compound_simple_list':
             key_index = int(key_index_info[2])
             if type(value[key_name]) is list:
                 value = value[key_name][key_index]
@@ -66,7 +66,7 @@ def add_or_update_key_in_dict(dictionary, keys_list, level=-1, value=None):
     if key_type == 'key':
         if is_terminal_key:
             current_location[key_name] = value
-            if parent_key_info[0] == 'simple_list':
+            if parent_key_info[0] == 'simple_list' or parent_key_info[0] == 'compound_simple_list':
                 current_location[key_name] = value.split(';') if value else []
         else:
             '''if key is not a terminal key then it must be a dictionary'''
@@ -80,7 +80,7 @@ def add_or_update_key_in_dict(dictionary, keys_list, level=-1, value=None):
         else:
             raise KeyError('* should be on the top most key.')
 
-    elif key_type == 'compound_list':
+    elif key_type == 'compound_list' or key_type == 'compound_simple_list':
         key_index = int(key_index_info[2])
 
         '''if the dictionary doesn't contain the key then initialize it'''

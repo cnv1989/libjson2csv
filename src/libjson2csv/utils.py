@@ -14,6 +14,10 @@ KEY_TYPES = {
     "simple_list": {
         "specifier": "*%s",
         "regex": "^\*([A-Za-z0-9_-]+)$"
+    },
+    "compound_simple_list": {
+        "specifier": "*%s[%s]",
+        "regex": "^\*([A-Za-z0-9_-]+)\[([0-9]+)\]$"
     }
 }
 
