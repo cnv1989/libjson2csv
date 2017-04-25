@@ -32,7 +32,7 @@ def reduce_key(key, value, minimize_columns=False):
             i = 0
             for sub_item in value:
                 '''Create a new column for each of the index in the list.'''
-                reduced_item.update(reduce_key("%s" % (repr_compound_list(key, i)), sub_item))
+                reduced_item.update(reduce_key("%s" % (repr_compound_list(key, i)), sub_item, minimize_columns=minimize_columns))
                 i = i + 1
 
     elif type(value) is dict:
